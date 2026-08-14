@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overlay · TallyUp</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Palco 1920x1080 escalado para o tamanho da Fonte de Navegador do OBS.
+       Fundo transparente: aparecem apenas os contadores. -->
+  <div id="stage-wrap">
+    <div id="overlay"></div>
+  </div>
+
+  <template id="counter-template">
+    <div class="counter" data-id="">
+      <span class="label"></span>
+      <span class="value"></span>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

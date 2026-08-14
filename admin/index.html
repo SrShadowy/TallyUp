@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel · TallyUp</title>
+  <!-- Aplica o tema salvo ANTES do primeiro paint (evita flash) -->
+  <script>try { document.documentElement.dataset.theme = localStorage.getItem("obsco.uitheme") || "dark-green"; } catch (e) {}</script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">🧮</span>
+      <div>
+        <h1>TallyUp</h1>
+        <p class="subtitle">Painel de controle</p>
+      </div>
+    </div>
+
+    <div class="mode-switch" role="tablist" aria-label="Modo">
+      <button class="mode-btn active" data-mode="control" role="tab">🎮 Controle</button>
+      <button class="mode-btn" data-mode="editor" role="tab">🎨 Editor</button>
+      <button class="mode-btn" data-mode="vfx" role="tab">🎬 VFX</button>
+    </div>
+
+    <div class="topbar-right">
+      <span id="status" class="status status--off">
+        <span class="dot"></span><span class="status-text">Conectando…</span>
+      </span>
+      <select id="ui-theme-select" class="profile-select ui-theme-select" title="Tema do painel"></select>
+      <select id="profile-select" class="profile-select" title="Perfil ativo (contadores, tema e atalhos próprios)"></select>
+      <button id="open-stats" class="btn btn-ghost" type="button" title="Estatísticas da sessão">📊 Stats</button>
+      <button id="open-hotkeys" class="btn btn-ghost" type="button" title="Atalhos globais">⌨ Hotkeys</button>
+      <a id="open-overlay" class="btn btn-ghost" href="/overlay" target="_blank" rel="noopener">Abrir overlay</a>
+      <button id="copy-overlay" class="btn btn-ghost" type="button">Copiar link</button>
+    </div>
+  </header>
+
+  <!-- Modal de Hotkeys (preenchido via JS) -->
+  <div id="hotkeys-modal" class="modal hidden" aria-hidden="true"></div>
+
+  <!-- =========================== MODO CONTROLE =========================== -->
+  <main class="view" id="view-control">
+    <div class="control-bar">
+      <div class="seg" id="ctrl-mode-seg" title="Modo de visualização">
+        <button data-cmode="cards" class="active" title="Cards">▦</button>
+        <button data-cmode="table" title="Tabela">▤</button>
+        <button data-cmode="grid" title="Grade">◫</button>
+        <button data-cmode="list" title="Lista">≣</button>
+      </div>
+      <div class="cbar-search">
+        <input id="ctrl-search" type="search" placeholder="🔍 Buscar elemento…" autocomplete="off" />
+      </div>
+      <div class="cbar-actions">
+        <button class="btn btn-ghost" id="ctrl-preview-toggle" title="Mostrar/ocultar preview">🖥 Preview</button>
+        <button class="btn btn-primary" id="ctrl-add" title="Adicionar contador, texto, imagem ou timer">+ Novo Elemento</button>
+      </div>
+    </div>
+
+    <div class="control-body">
+      <div class="control-main" id="control-main" data-cmode="cards" aria-live="polite"></div>
+
+      <aside class="control-preview" id="control-preview">
+        <div class="cprev-head">
+          <span>Preview do overlay <em>ao vivo</em></span>
+          <button class="icon-btn" id="ctrl-preview-close" title="Ocultar preview">×</button>
+        </div>
+        <div class="cprev-frame-wrap" id="cprev-wrap">
+          <iframe id="cprev-frame" src="/overlay" title="Preview do overlay" scrolling="no"></iframe>
+        </div>
+        <a class="btn btn-ghost sm cprev-open" href="/overlay" target="_blank" rel="noopener">Abrir em tela cheia ↗</a>
+      </aside>
+    </div>
+
+    <div id="empty" class="empty hidden">
+      <p>Nenhum elemento ainda.</p>
+      <p class="muted">Clique em <strong>+ Novo Elemento</strong> para criar um contador, texto, imagem ou timer. 🎮</p>
+      <p class="muted">Dica: clique no nome para editar · use <strong>⋮</strong> para mais ações · arraste <strong>☰</strong> para reordenar</p>
+    </div>
+  </main>
+
+  <!-- ============================ MODO EDITOR ============================ -->
+  <main class="view hidden" id="view-editor">
+    <div class="editor3">
+      <!-- Barra de ferramentas -->
+      <div class="editor-toolbar">
+        <div class="tb-group">
+          <span class="tb-label">Preset</span>
+          <select id="preset-select" class="row-select"></select>
+          <button class="icon-btn" id="preset-save" type="button" title="Salvar a aparência atual como preset">💾</button>
+          <button class="icon-btn" id="preset-del" type="button" title="Excluir um preset seu">🗑</button>
+        </div>
+        <div class="tb-group" title="Tamanho do canvas do overlay (por perfil)">
+          <span class="tb-label">Canvas</span>
+          <select id="canvas-preset" class="row-select"></select>
+          <input id="canvas-w" class="tb-num" type="number" min="320" max="7680" step="10" />
+          <span class="tb-x">×</span>
+          <input id="canvas-h" class="tb-num" type="number" min="320" max="4320" step="10" />
+        </div>
+        <div class="tb-group">
+          <button class="icon-btn" id="undo" title="Desfazer (Ctrl+Z)" disabled>↶</button>
+          <button class="icon-btn" id="redo" title="Refazer (Ctrl+Shift+Z)" disabled>↷</button>
+        </div>
+
+        <div class="tb-spacer"></div>
+
+        <div class="tb-group">
+          <span class="tb-label">Zoom</span>
+          <div class="seg" id="zoom-seg">
+            <button data-zoom="fit">Fit</button>
+            <button data-zoom="1" class="active">100%</button>
+            <button data-zoom="2">200%</button>
+            <button data-zoom="4">400%</button>
+          </div>
+        </div>
+
+        <div class="tb-group">
+          <span class="tb-label">Alinhar</span>
+          <div class="seg" id="align-seg" title="Com 1 selecionado alinha ao canvas; com vários, à seleção">
+            <button data-align="left" title="Alinhar à esquerda">⇤</button>
+            <button data-align="ch" title="Centralizar na horizontal">⇹</button>
+            <button data-align="right" title="Alinhar à direita">⇥</button>
+            <button data-align="top" title="Alinhar ao topo">⤒</button>
+            <button data-align="cv" title="Centralizar na vertical">⇳</button>
+            <button data-align="bottom" title="Alinhar à base">⤓</button>
+            <button data-align="dh" title="Distribuir na horizontal (3+)">⇶</button>
+            <button data-align="dv" title="Distribuir na vertical (3+)">⫶</button>
+          </div>
+        </div>
+
+        <div class="tb-group">
+          <span class="tb-label">Ver</span>
+          <div class="seg" id="view-seg">
+            <button data-view="grid" title="Grade">▦</button>
+            <button data-view="safe" title="Área segura da transmissão">▭</button>
+            <button data-view="snap" class="active" title="Snap (encaixe)">⌗</button>
+            <button data-view="tree" class="active" title="Mostrar/ocultar painel Estrutura">◧</button>
+            <button data-view="props" class="active" title="Mostrar/ocultar painel Propriedades">◨</button>
+          </div>
+          <div class="seg" id="bg-seg">
+            <button data-bg="checker" class="active" title="Xadrez (transparente)">▦</button>
+            <button data-bg="black" title="Preto">■</button>
+            <button data-bg="white" title="Branco">□</button>
+          </div>
+        </div>
+
+        <div class="tb-group">
+          <button class="btn btn-ghost sm" id="theme-export" title="Exportar tema">⬇</button>
+          <label class="btn btn-ghost sm" for="theme-import-file" title="Importar tema">⬆</label>
+          <input id="theme-import-file" type="file" accept="application/json,.json" hidden />
+          <button class="btn btn-ghost sm" id="theme-reset" title="Restaurar tema padrão">↺</button>
+        </div>
+      </div>
+
+      <!-- Corpo: Estrutura · Canvas · Propriedades -->
+      <div class="editor-body3">
+        <!-- ESQUERDA: árvore de elementos -->
+        <aside class="tree-panel">
+          <div class="panel-head">
+            <span>Estrutura</span>
+            <button class="btn btn-primary sm" id="tree-add" type="button" title="Adicionar contador, texto, imagem ou timer">+ Elemento</button>
+          </div>
+          <div class="tree" id="tree"></div>
+        </aside>
+
+        <!-- Divisor arrastável (Estrutura ↔ Canvas) -->
+        <div class="col-splitter" id="split-tree" title="Arraste para redimensionar o painel Estrutura"></div>
+
+        <!-- CENTRO: canvas do overlay -->
+        <div class="canvas-wrap" id="canvas-wrap">
+          <div class="canvas-scale" id="canvas-scale">
+            <div class="canvas-frame" id="canvas-frame">
+              <div class="grid-layer"></div>
+              <div class="safe-layer"></div>
+              <div class="canvas-counters" id="canvas-counters"></div>
+              <div class="sel-box" id="sel-box" hidden>
+                <span class="h h-nw"></span><span class="h h-n"></span><span class="h h-ne"></span>
+                <span class="h h-e"></span><span class="h h-se"></span><span class="h h-s"></span>
+                <span class="h h-sw"></span><span class="h h-w"></span>
+              </div>
+            </div>
+          </div>
+          <div class="canvas-badge" id="canvas-badge">1920 × 1080</div>
+        </div>
+
+        <!-- Divisor arrastável (Canvas ↔ Propriedades) -->
+        <div class="col-splitter" id="split-props" title="Arraste para redimensionar o painel Propriedades"></div>
+
+        <!-- DIREITA: propriedades contextuais -->
+        <aside class="props-panel">
+          <div id="props-ctx"></div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <!-- ============================= MODO VFX ============================== -->
+  <main class="view hidden" id="view-vfx">
+    <div class="vfx-wrap">
+      <div class="vfx-head">
+        <div>
+          <h2>🎬 Efeitos de mudança de valor</h2>
+          <p class="muted">A animação toca no overlay quando um valor muda (botão ou hotkey).
+            Escolha o efeito global (ou por elemento) no Editor → seção Sombras → <strong>Animação ao mudar</strong>.
+            Aqui você testa, edita o CSS de cada preset e cria os seus.</p>
+        </div>
+        <div class="vfx-head-btns">
+          <button id="fx-new" class="btn btn-primary">+ Novo efeito</button>
+          <button id="fx-restore" class="btn btn-ghost" title="Restaura os efeitos padrão sem apagar os seus">↺ Restaurar padrões</button>
+        </div>
+      </div>
+      <div class="vfx-grid" id="vfx-grid"></div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <span>Tudo roda localmente · sem nuvem · sem login</span>
+    <span id="autosave" class="muted">Auto-save ✓</span>
+    <span id="overlay-url" class="muted"></span>
+  </footer>
+
+  <!-- Template de card (modo Controle) -->
+  <template id="card-template">
+    <article class="counter-card" data-id="">
+      <div class="card-top">
+        <div class="order-btns">
+          <button class="icon-btn move-up" title="Mover para cima" aria-label="Mover para cima">▲</button>
+          <button class="icon-btn move-down" title="Mover para baixo" aria-label="Mover para baixo">▼</button>
+        </div>
+        <input class="name-input" type="text" maxlength="40" />
+        <div class="top-actions">
+          <button class="icon-btn toggle-vis" title="Ocultar/Mostrar no overlay" aria-label="Ocultar ou mostrar">👁</button>
+          <button class="icon-btn danger delete" title="Excluir" aria-label="Excluir">🗑</button>
+        </div>
+      </div>
+
+      <div class="card-main">
+        <button class="big-btn dec" aria-label="Diminuir">−</button>
+        <input class="value-input" type="number" inputmode="numeric" />
+        <button class="big-btn inc" aria-label="Aumentar">＋</button>
+      </div>
+
+      <div class="card-bottom">
+        <label class="step-field">
+          Passo
+          <input class="step-input" type="number" min="1" step="1" />
+        </label>
+        <button class="btn btn-ghost reset">Zerar</button>
+      </div>
+    </article>
+  </template>
+
+  <!-- Template de contador no preview do editor -->
+  <template id="preview-counter-template">
+    <div class="counter" data-id="">
+      <span class="label"></span>
+      <span class="value"></span>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
