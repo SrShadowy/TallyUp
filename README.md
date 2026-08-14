@@ -1,5 +1,9 @@
 # TallyUp
 
+<p align="center">
+  <img src="./admin/FavIcon.png" alt="TallyUp logo" width="120" />
+</p>
+
 🇧🇷 Português · [🇺🇸 English](README.en.md)
 
 **Overlay de contagem ao vivo para OBS.** Contadores, timers, textos e imagens na sua transmissão, com editor visual, hotkeys globais e perfis por jogo. Roda 100% em `localhost` — sem nuvem, sem banco de dados, sem login.

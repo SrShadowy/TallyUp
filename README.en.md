@@ -1,5 +1,9 @@
 # TallyUp
 
+<p align="center">
+  <img src="./admin/FavIcon.png" alt="TallyUp logo" width="120" />
+</p>
+
 [🇧🇷 Português](README.md) · 🇺🇸 English
 
 **Live tally overlay for OBS.** Counters, timers, free text and images on your
