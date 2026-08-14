@@ -135,6 +135,7 @@ celerybeat.pid
 *.rdb
 *.aof
 *.pid
+*.bak
 
 # RabbitMQ
 mnesia/
@@ -156,6 +157,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+config/
 
 # Spyder project settings
 .spyderproject
