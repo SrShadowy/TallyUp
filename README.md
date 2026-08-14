@@ -93,7 +93,7 @@ Ao iniciar, abra:
 ## 🗂️ Estrutura do projeto
 
 ```
-WinRate/
+TallyUp/
 ├── server.py            # servidor FastAPI (REST + WebSocket)
 ├── requirements.txt
 ├── start.bat / start.sh # inicializadores
