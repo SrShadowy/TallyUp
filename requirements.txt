@@ -1,0 +1,11 @@
+# OBS Counter Overlay — dependências
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9   # upload de imagens (/assets/upload)
+
+# Fase 2 — hotkeys globais.
+# Windows / macOS: pynput (hook global).
+# Linux (X11 e Wayland): evdev, lendo /dev/input direto do kernel — precisa que o
+# usuário esteja no grupo 'input' (sudo usermod -aG input $USER + relogin).
+pynput>=1.7
+evdev>=1.6 ; sys_platform == "linux"

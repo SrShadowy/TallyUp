@@ -1,0 +1,4 @@
+# Dependências de desenvolvimento (testes)
+-r requirements.txt
+pytest>=8
+httpx2>=2          # usado pelo TestClient do FastAPI/Starlette (sucessor do httpx)
