@@ -10,6 +10,18 @@
 
 > Ideal para lives: mortes, vitórias, chefes derrotados, tentativas de speedrun, cronômetro de desafio, kills, etc.
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="./prints/Canvas.png" alt="Canvas do editor" width="420" />
+  <img src="./prints/ControleEditor.png" alt="Dashboard e editor" width="420" />
+  <img src="./prints/Hotkeys.png" alt="Hotkeys" width="420" />
+  <br />
+  <img src="./prints/NoObs.png" alt="Overlay no OBS" width="420" />
+  <img src="./prints/CssEditor.png" alt="Editor de CSS" width="420" />
+  <img src="./prints/Estatisticas.png" alt="Estatísticas" width="420" />
+</p>
+
 ---
 
 ## ✨ O que já funciona (Fase 1 — MVP)

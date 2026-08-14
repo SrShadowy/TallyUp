@@ -13,6 +13,18 @@ on `localhost` — no cloud, no database, no login.
 > Perfect for streams: deaths, wins, bosses defeated, speedrun attempts,
 > challenge timers, kills, and more.
 
+## 📸 Screenshots
+
+<p align="center">
+  <img src="./prints/Canvas.png" alt="Canvas editor" width="420" />
+  <img src="./prints/ControleEditor.png" alt="Dashboard and editor" width="420" />
+  <img src="./prints/Hotkeys.png" alt="Hotkeys" width="420" />
+  <br />
+  <img src="./prints/NoObs.png" alt="Overlay in OBS" width="420" />
+  <img src="./prints/CssEditor.png" alt="CSS editor" width="420" />
+  <img src="./prints/Estatisticas.png" alt="Statistics" width="420" />
+</p>
+
 ---
 
 ## ✨ What's included
